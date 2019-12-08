@@ -1,58 +1,56 @@
 #pragma once
 #include <iostream>
-#include <iomanip>
 #include <vector>
 #include <string>
-// #include <ostream>
+#include <memory>
 #include <cmath>
+
+#include "heap.h"
 
 struct Flight;
 struct Port {//struct for airport info (vertexes)
 public:
     std::string code;
-    std::vector<Port*> adjlist; //list of destination airports that are one flight from the current port
-    std::vector<Flight*> depflights; //list of flights departing from this airport
+    std::vector<std::shared_ptr<Port>> adjlist; //list of destination airports that are one flight from the current port
+    std::vector<std::shared_ptr<Flight>> depflights; //list of flights departing from this airport
     int dval;
-    // int parentid;
-
+    // int parentid; what this for?
     //CONSTRUCTOR//
     Port(std::string code, int d_in);
-    friend std::ostream& operator <<(std::ostream& os, Port const* prt)
-    {
-        return os << "Airport Code: " << prt->code << '\n'
-                  << "dval: " << prt->dval << '\n';
-    };
+    void prt();
 };
 
 struct Flight{//struct for flight data (edges)
     static int fltcount;
     int fltnum;
-    Port* origin;
-    Port* dest;
+    std::shared_ptr<Port> origin;
+    std::shared_ptr<Port> dest;
     float deptime; //departure time
     float arrtime; //arrival time
 
-    Flight(Port* orig_in, Port* dest_in, int time_in, float length_in);
+    //CONSTRUCTOR//
+    Flight(std::shared_ptr<Port> orig_in, std::shared_ptr<Port> dest_in, int time_in, float length_in);
+    void prt();
+};
 
-    void prt()
+class FlightMap
+{//class for creating and holding all the travel data related to a graph of airports and flights
+    std::vector<std::shared_ptr<Port>> ports;
+    std::vector<std::shared_ptr<Flight>> flights;
+    // std::unique_ptr<Heap> heap;
+public:
+    //CONSTRUCTOR//
+    FlightMap(int port_count, int flight_count);
+    //FUNCTIONS//
+    static float genTime(int MAX_HOURS);
+    static std::string genCode(int code_length);
+    //PRINT FUNCTION//
+            // for(std::shared_ptr<flight> f : p->depflights){
+    friend std::ostream& operator <<(std::ostream& os, std::shared_ptr<FlightMap> const fltmp)
     {
-        std::cout << "Num: " << this->fltnum << "\n\t"
-                  << "Origin: " << this->origin->code << "\n\t"
-                  << "Destination: " << this->dest->code << "\n\t";
-        printf("Departure Time: %02.f:%02.f\n\t",floor(this->deptime), (this->deptime - floor(this->deptime))*100);
-        printf("Arrival Time: %02.f:%02.f",floor(this->arrtime), (this->arrtime - floor(this->arrtime))*100);
-        // << "Departure Time: " << floor(flt->deptime) << ":" << std::setw(2) << (flt->deptime - floor(flt->deptime))*100 << "\n\t"
-        // << "Arrival Time: " << floor(flt->arrtime) << ":" << (flt->arrtime - floor(flt->deptime))*100;
+        for(std::shared_ptr<Port> p : fltmp->ports){
+            p->prt();
+        }
+        return os << "\n";
     };
-    // friend std::ostream& operator <<(std::ostream& os, Flight const* flt)
-    // {
-    //     os << "Num: " << flt->fltnum << "\n\t"
-    //         << "Origin: " << flt->origin->code << "\n\t"
-    //         << "Destination: " << flt->dest->code << "\n\t";
-    //     printf("Departure Time: %02.f:%02.f\n\t",floor(flt->deptime), (flt->deptime - floor(flt->deptime))*100);
-    //     printf("Arrival Time: %02.f:%02.f",floor(flt->arrtime), (flt->arrtime - floor(flt->arrtime))*100);
-    //     return os << "\n";
-    //     // << "Departure Time: " << floor(flt->deptime) << ":" << std::setw(2) << (flt->deptime - floor(flt->deptime))*100 << "\n\t"
-    //     // << "Arrival Time: " << floor(flt->arrtime) << ":" << (flt->arrtime - floor(flt->deptime))*100;
-    // };
 };

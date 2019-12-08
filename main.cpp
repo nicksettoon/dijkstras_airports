@@ -7,54 +7,21 @@ using str = std::string;
 // auto& out = std::cout;
 // auto& end = std::endl;
 
-int Flight::fltcount = 0; 
-float genTime(int MAX_HOUR)
-{
-    float min = float(rand() % 61)/100.0;
-    // float newmin = min/100.0;
-    float time = (rand() % MAX_HOUR) + min;
-    return time;
-}
-
 int main()
 {
-    int size = 10;
-    Port* ports[size];
-    Flight* flights[size*2];
-    Heap* heap =  new Heap(2);
-    str arr[size] = {"SAN", "ASE", "DAB", "MCO", "AUG", "BOS", "BTL", "BTR", "ACY", "ALB"}; 
+    int portcount = 10;
+    int flightcount = 30;
+    std::shared_ptr<FlightMap> map = std::make_shared<FlightMap>(portcount, flightcount);
 
-    //fill ports
-    for (int i = 0 ; i < size ; i++){
-        Port* newport = new Port(arr[i], 0);
-        ports[i] = newport;
-    }
-    //fill flights
-    for (int i = 0 ; i < 2*size ; i++){
-        float deptime = genTime(24); //gen random flight deptime less than 24hrs
-        float length = genTime(12) + 1; //generate random flight length less than 12hrs
-        //randomize ports
-        Port* port1;
-        Port* port2;
-        do
-        { 
-            port1 = ports[rand() % size];
-            port2 = ports[rand() % size];
-        } while(port1 == port2);
-
-        Flight* newflight = new Flight(port1, port2, deptime, length);
-        flights[i] = newflight;
-        port1->adjlist.push_back(port2);
-        port1->depflights.push_back(newflight);
-    }
-
-    while(heap->heap.size() > 0){
-        HNode* extnode = heap->extractMin();
-        int x = extnode->vid;
-        for (int i = 0; i < n; i++){
-            int w = verts[x]->adjlist[i];
-        }
-    }
+    std::cout << map;
+    // actual djikstras
+    // while(heap->heap.size() > 0){
+    //     HNode* extnode = heap->extractMin();
+    //     int x = extnode->vid;
+    //     for (int i = 0; i < n; i++){
+    //         int w = verts[x]->adjlist[i];
+    //     }
+    // }
     // for (int i = 0 ; i < size ; i++){
     //     HNode* node = heap->extractMin();
     //     std::cout << node->vid << ":" << node->dvalue << "\t";
