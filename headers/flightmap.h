@@ -9,7 +9,6 @@
 
 struct Flight;//forward declaration of Flight so Port struct can see it exists
 struct Port {//struct for airport info (vertexes)
-public:
     int pheaploc; //port id (its index in the flightmap's portlist)
     std::string code; //the airport code
     std::vector<std::shared_ptr<Port>> adjlist; //list of destination airports that are one flight from the current port
@@ -50,7 +49,7 @@ public:
     //PRINT FUNCTION//
     friend std::ostream& operator <<(std::ostream& os, std::shared_ptr<FlightMap> const fltmp)
     {
-        for(std::shared_ptr<Port> p : fltmp->portlist){
+        for(std::shared_ptr<Port> p : fltmp->portheap){
             p->prt();
         }
         return os << "\n";

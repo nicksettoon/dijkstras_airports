@@ -20,7 +20,9 @@ int main()
     while(map->portheap.size() > 0)
     {//while there are ports left in the heap
         s_Port* cport = map->extractMin(map->portheap);//grab the port with the smallest splen
-        int x = cport->pheaploc;
+        // int x = cport->pheaploc;
+        float t;
+        float newsp;
         for (int i = 0; i < cport->depflights.size(); i++)
         {//for each flight leaving the current port
             s_Flight e = cport->depflights.at(i); //get flight object
@@ -28,17 +30,15 @@ int main()
             //calc edge weight (flight time cost)
             float t = (e->arrtime - e->deptime) + 1; //(arrival - departure) + 1 hour layover
             float newsp = t + cport->splen; //get possible new shortest path to next port
-            if((newsp < w->splen)
+            if((newsp < w->splen))
             {//if this flight is a shorter path from startport to w than what w already has stored
-                w->splen = t + cport->splen;
-                // w->pheaploc = x; why is this necessary?
-                map->decreaseKey(map->portheap, w, )
-
+                //change the destination's splen value to the newsp
+                map->updateKey(map->portheap, w, newsp);
             }
         }
     }
 
-    print()
+    // print()
     return 1;
 }
 //n=Readsize(inputfile);

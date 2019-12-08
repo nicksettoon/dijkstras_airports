@@ -39,7 +39,6 @@ void Flight::prt()
     printf("Arrival Time: %02.f:%02.f\n",floor(this->arrtime), (this->arrtime - floor(this->arrtime))*100);
 };
 
-
 int Flight::fltcount = 0; 
 FlightMap::FlightMap(int port_count, int flight_count)
     : portcount(port_count), flightcount(flight_count)
