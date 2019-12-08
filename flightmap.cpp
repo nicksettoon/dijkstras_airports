@@ -4,66 +4,38 @@ using str = std::string;
 using s_Port = std::shared_ptr<Port>;
 using s_Flight = std::shared_ptr<Flight>;
 
-Port::Port(str code_in, int d_in)
-    : code(code_in), splen(d_in) {/*CONSTRUCTOR*/}
-//PRINT FUNCTION//
-void Port::prt()
-{
-    std::cout << "\nAirport Code: " << this->code << '\t'
-                << "Shortest Path Length: " << this->splen << '\n';
-    if (this->depflights.size() == 0){
-        std::cout << "There are no flights leaving " << this->code << std:: endl;
+FlightMap::FlightMap(int port_count, int flight_count)
+    : portcount(port_count), flightcount(flight_count)
+    {/*CONSTRUCTOR*/
+        s_Port newport = std::make_shared<Port>("ABC", std::numeric_limits<float>::max()); //create airport node with maximum splen
+        this->portheap.push_back(newport);
     }
-    for(std::shared_ptr<Flight> flt : this->depflights){
-        flt->prt();
+
+void FlightMap::genPorts()
+{//generate ports
+    s_Port newport;
+    for (int i = 0 ; i < this->portcount ; i++){
+        str portcode = FlightMap::genCode(3); //generate airport code
+        newport = std::make_shared<Port>(portcode, std::numeric_limits<float>::max()); //create airport node with maximum splen
+        // newport->pheaploc = this->portlist.size(); //tell the port where it's located in the list
+        this->insertPort(newport); //push the port onto the heap
     }
 }
 
-Flight::Flight(s_Port orig_in, s_Port dest_in, int time_in, float length_in)
-    : fltnum(fltcount++), origin(orig_in), dest(dest_in), deptime(time_in)
-    {/*CONSTRUCTOR*/
-        float endtime = this->deptime + length_in;
-        if (endtime > 24){
-            this->arrtime = endtime - 24;
-        }
-        else
-            this->arrtime = endtime;
-    }
-//PRINT FUNCTION//
-void Flight::prt()
-{
-    std::cout << "Num: " << this->fltnum << "\n\t"
-                << "Origin: " << this->origin->code << "\n\t"
-                << "Destination: " << this->dest->code << "\n\t";
-    printf("Departure Time: %02.f:%02.f\n\t",floor(this->deptime), (this->deptime - floor(this->deptime))*100);
-    printf("Arrival Time: %02.f:%02.f\n",floor(this->arrtime), (this->arrtime - floor(this->arrtime))*100);
-};
+void FlightMap::genFlights()
+{//generate flights
 
-int Flight::fltcount = 0; 
-FlightMap::FlightMap(int port_count, int flight_count)
-    : portcount(port_count), flightcount(flight_count)
-{//generates a set of airports, flights between them and stores the portids in a heap for djikstra's algo
-    // this->portlist.resize(this->portcount)
-    //generate ports
-    s_Port newport;
     s_Flight newflight;
-    for (int i = 0 ; i < flight_count ; i++){
-        str portcode = FlightMap::genCode(3); //generate airport code
-        newport = std::make_shared<Port>(portcode, 0); //create airport node
-        // newport->pheaploc = this->portlist.size(); //tell the port where it's located in the list
-        int portloc = this->insertPort(this->portheap, newport); //push the port onto the heap
-        newport->pheaploc = portloc; //record the location of the port in the heap for future decrease key operations
-    }
-    //generate flights
-    for (int i = 0 ; i < flight_count; i++){
+    for (int i = 0 ; i < this->flightcount; i++){
         float deptime = FlightMap::genTime(24); //gen random flight deptime less than 24hrs
         float length = FlightMap::genTime(12) + 1; //generate random flight length less than 12hrs this is the weight of the edge
         //randomize ports
-        s_Port port1; s_Port port2;
+        s_Port port1;
+        s_Port port2;
         do
         {//get two different random ports from the port list
-            port1 = this->portheap.at(rand() % port_count);
-            port2 = this->portheap.at(rand() % port_count);
+            port1 = this->portheap.at(rand() % this->portcount);
+            port2 = this->portheap.at(rand() % this->portcount);
         } while(port1 == port2);
         //create the new flight
         newflight = std::make_shared<Flight>(port1, port2, deptime, length);
@@ -71,6 +43,7 @@ FlightMap::FlightMap(int port_count, int flight_count)
         this->flights.push_back(newflight);
         port1->adjlist.push_back(port2);
         port1->depflights.push_back(newflight); }
+
 }
 
 str FlightMap::genCode(int length_in)
@@ -90,4 +63,95 @@ float FlightMap::genTime(int MAX_HOUR)
     // float newmin = min/100.0;
     float time = (rand() % MAX_HOUR) + min;
     return time;
+}
+
+int FlightMap::insertPort(s_Port port_in)
+{
+    //push port on to the bottom of the heap
+    if(this->portheap.size() == 0){
+        this->portheap.push_back(port_in);
+        port_in->pheaploc = 0; //record the location of the port in the heap for future decrease key operations
+        return 0;
+    }
+    this->portheap.push_back(port_in);//add the port to the heap
+    port_in->pheaploc = this->portheap.size() - 1;//tell it what it's index in the heap is
+    //send port_in off to bubble up and return its settled locatioinlocation of inserted node.
+    return this->bubbleUp(port_in->pheaploc);
+}
+
+int FlightMap::bubbleUp(int node_in)
+{//bubbles a child node up the heap until it reaches its correct place, then returns that location
+    int nodeout = node_in;
+    int node_inparent= (nodeout - 1) / 2;
+    s_Port oldport;
+    //bubble up the inserted node if need be
+    while(this->portheap[node_inparent]->splen > this->portheap[nodeout]->splen)
+    {//while the parent's key is greater than the child's key
+        //swap parent and child
+        oldport = this->portheap[node_inparent]; //store parent node
+        this->portheap[node_inparent] = this->portheap[nodeout]; //move child node up into parent slot
+        this->portheap[node_inparent]->pheaploc = node_inparent; //update child pheaploc
+        this->portheap[nodeout] = oldport;
+        oldport->pheaploc = nodeout;
+        //move parent and child indicies up the heap
+        nodeout = node_inparent;
+        node_inparent= (nodeout - 1) / 2;
+    }
+    return nodeout;
+}
+
+int FlightMap::bubbleDown(int node_in)
+{
+    //assume given node is the smallest of the three being considered
+    int smallest = node_in;
+    //get left and right child indicies of current node
+    int l = 2*node_in + 1;
+    int r = 2*node_in + 2;
+    //left index hasn't overflowed the heap and the left child < current smallest node
+    if (l < (this->portheap.size()-1) && this->portheap[l]->splen < this->portheap[smallest]->splen)
+        smallest = l;
+    //right index hasn't overflowed the heap and the right child < current smallest node
+    if (r < this->portheap.size() && this->portheap[r]->splen < this->portheap[smallest]->splen)
+        smallest = r;
+
+    s_Port oldport;
+    if (smallest != node_in)
+    { //if a new smallest node was found
+        //swap dem nodes
+        s_Port oldport = this->portheap[node_in];
+        this->portheap[node_in] = this->portheap[smallest]; //move node in the array
+        this->portheap[node_in]->pheaploc = node_in; //change node's pheaploc to new location
+        this->portheap[smallest] = oldport; //put oldport in it's new location
+        oldport->pheaploc = smallest;//update the oldport's pheaploc value
+        //recurse with new smallest
+        bubbleDown(smallest);
+    }
+    return smallest;
+}
+
+s_Port FlightMap::extractMin()
+{//removes the top node on the heap and bubbles down its replacement
+    s_Port oldport;
+    //Swap the last element of the heap with the first
+    oldport = this->portheap.front();
+    this->portheap.front() = this->portheap.back();
+    this->portheap.front()->pheaploc = 0; //set new pheaploc for new root
+    //delete last element from heap
+    this->portheap.pop_back();
+    //restore heap Property
+    this->bubbleDown(0);
+    return oldport;
+}
+
+int FlightMap::updateKey(s_Port port_in, float new_splen)
+{//changes the key of a node in the heap and begins the process of moving it to the proper location
+    port_in->splen = new_splen;//change port's key in heap
+    //now let's fix upwards in the heap
+    if(port_in->splen < this->portheap.at((port_in->pheaploc - 1)/2)->splen)
+    {//if port's key is less than it's parent's key
+        return this->bubbleUp(port_in->pheaploc); //bubble the port node up the heap
+    }
+    else
+        return this->bubbleDown(port_in->pheaploc);
+    
 }
