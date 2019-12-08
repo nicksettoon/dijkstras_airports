@@ -1,0 +1,16 @@
+{
+    "settings": {
+        "files.associations": {
+            "array": "cpp",
+            "hash_map": "cpp",
+            "string_view": "cpp",
+            "initializer_list": "cpp",
+            "utility": "cpp"
+        }
+    },
+    "folders": [
+		{
+			"path": "."
+		}
+	]
+}
