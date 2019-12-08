@@ -3,6 +3,7 @@
 
 struct Flight;
 struct Port {//struct for airport info (vertexes)
+    static unsigned int prtcount;
     unsigned int pheaploc; //port id (its index in the flightmap's portlist)
     std::string code; //the airport code
     std::vector<std::shared_ptr<Port>> adjlist; //list of destination airports that are one flight from the current port
@@ -32,21 +33,31 @@ class FlightMap
 public:
     int portcount;
     int flightcount;
-    std::vector<std::shared_ptr<Flight>> flights{}; //vector of flight pointers
     std::vector<std::shared_ptr<Port>> portheap{}; //vector of port pointers for use with heap functions
+    //Algorithm starting conditions//
+    float starttime;
+    std::shared_ptr<Port> startport;
+    std::shared_ptr<Port> endport;
+    //set of flights to get to endport in fastest time
+    std::vector<std::shared_ptr<Flight>> spset{}; //vector of flight pointers
+
     //CONSTRUCTOR//
+    FlightMap();
     FlightMap(int port_count, int flight_count);
-    //FUNCTIONS//
+    
+    //GENERATOR FUNCTIONS//
     void genPorts();
     void genFlights();
     static float genTime(int MAX_HOURS);
     static std::string genCode(int code_length);
+
+    //HEAP FUNCTIONS//
     int bubbleUp(int start_node);
     int bubbleDown(int start_node);
-    //FUNCTIONS//
     std::shared_ptr<Port> extractMin();
     int insertPort(std::shared_ptr<Port> port_in);
     int updateKey(std::shared_ptr<Port> port_in, float new_key);
+
     //PRINT FUNCTION//
     friend std::ostream& operator <<(std::ostream& os, std::shared_ptr<FlightMap> const fltmp)
     {

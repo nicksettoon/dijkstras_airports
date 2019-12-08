@@ -4,12 +4,10 @@ using str = std::string;
 using s_Port = std::shared_ptr<Port>;
 using s_Flight = std::shared_ptr<Flight>;
 
+FlightMap::FlightMap(){/*CONSTRUCTOR*/}
+
 FlightMap::FlightMap(int port_count, int flight_count)
-    : portcount(port_count), flightcount(flight_count)
-    {/*CONSTRUCTOR*/
-        // s_Port newport = std::make_shared<Port>("ABC", 0); //create airport node with maximum splen
-        // this->portheap.push_back(newport);
-    }
+    : portcount(port_count), flightcount(flight_count){/*CONSTRUCTOR*/}
 
 void FlightMap::genPorts()
 {//generate ports
@@ -40,7 +38,7 @@ void FlightMap::genFlights()
         //create the new flight
         newflight = std::make_shared<Flight>(port1, port2, deptime, length);
         //store it
-        this->flights.push_back(newflight);
+        // this->flights.push_back(newflight);
         port1->adjlist.push_back(port2);
         port1->depflights.push_back(newflight); }
 
@@ -59,7 +57,7 @@ str FlightMap::genCode(int length_in)
 
 float FlightMap::genTime(int MAX_HOUR)
 {//generates random float representing a time of day
-    float min = float(rand() % 61)/100.0;
+    float min = float(rand() % 61)/60.0;
     // float newmin = min/100.0;
     float time = (rand() % MAX_HOUR) + min;
     return time;

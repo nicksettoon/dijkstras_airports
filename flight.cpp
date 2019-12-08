@@ -18,7 +18,7 @@ Flight::Flight(s_Port orig_in, s_Port dest_in, unsigned int time_in, float lengt
 //PRINT FUNCTION//
 void Flight::prt()
 {
-    std::cout << "Num: " << this->fltnum << "\n\t"
+    std::cout << "Flight num: " << this->fltnum << "\n\t"
                 << "Origin: " << this->origin->code << "\n\t"
                 << "Destination: " << this->dest->code << "\n\t";
     printf("Departure Time: %02.f:%02.f\n\t",floor(this->deptime), (this->deptime - floor(this->deptime))*100);
