@@ -1,96 +1,122 @@
 #include "headers/heap.h"
 
-HNode::HNode(int vid_in) 
-    : vid(vid_in), dvalue(0){/*CONSTRUCTOR*/}
+using s_Port = std::shared_ptr<Port>;
+using p_vec = std::vector<s_Port>;
 
-Heap::Heap(int k_in) 
-    : kary(k_in) {/*CONSTRUCTOR*/}
+// HNode::HNode(int port_ptr) 
+//     : portptr(port_ptr), dvalue(0){/*CONSTRUCTOR*/}
 
-int Heap::insert(HNode* node_in)
+HeapInterface::HeapInterface() {/*CONSTRUCTOR*/}
+
+int HeapInterface::insertPort(p_vec heap_in, s_Port port_in)
 {
-    if(this->heap.size() == 0)
-    {
-        this->heap.push_back(node_in);
-    }
-    else
-        this->heap.push_back(node_in);
-
-    // bool flag = true;
-    int childi = this->heap.size() - 1;
-    int parenti = (childi - 1) / this->kary;
-    HNode* temp;
-
-    // while(flag == true && parenti != childi){
-        // if(this->heap[parenti] > this->heap[childi]){
-    while(this->heap[parenti] > this->heap[childi]){
-        temp = this->heap[parenti];
-        this->heap[parenti] = this->heap[childi];
-        this->heap[childi] = temp;
-        childi = parenti;
-        parenti = (childi - 1) / this->kary;
-    }
+    //push port on to the bottom of the heap
+    heap_in.push_back(port_in);
+    //init parent and child indicies for bubble up
+    int childi = heap_in.size() - 1;
     //return location of inserted node.
-    return 1;
+    return this->bubbleUp(heap_in, childi);
 }
 
-void Heap::heapify(int parent_node)
+void HeapInterface::heapify(p_vec heap_in, int node_in)
 {
-    int smallest = parent_node;
+    //assume given node is the smallest of the three being considered
+    int smallest = node_in;
     if(this->kary == 2)
-    {
-        int l = 2*parent_node + 1;
-        int r = 2*parent_node + 2;
+    {//if heap is binary
+        //get left and right child indicies of current node
+        int l = 2*node_in + 1;
+        int r = 2*node_in + 2;
 
-        if (l < this->heap.size() && this->heap[l] < this->heap[smallest])
+        //left index hasn't overflowed the heap and the left child < current smallest node
+        if (l < (heap_in.size()-1) && heap_in[l]->splen < heap_in[smallest]->splen)
             smallest = l;
-        if (r < this->heap.size() && this->heap[r] < this->heap[smallest])
+        //right index hasn't overflowed the heap and the right child < current smallest node
+        else if (r < heap_in.size() && heap_in[r]->splen < heap_in[smallest]->splen)
             smallest = r;
     }
-    //Swap values if necessary
-    if (smallest != parent_node)
-    {
-        HNode* temp = this->heap[parent_node];
-        this->heap[parent_node] = this->heap[smallest];
-        this->heap[smallest] = temp;
+    if (smallest != node_in)
+    { //if a new smallest node was found
+        //swap dem nodes
+        s_Port temp = heap_in[node_in];
+        heap_in[node_in] = heap_in[smallest];
+        heap_in[smallest] = temp;
+        //recurse with new smallest
         heapify(smallest);
     }
 }
 
-HNode* Heap::extractMin()
+s_Port* HeapInterface::extractMin(p_vec heap_in)
 {
+    s_Port* temp;
     //Swap the last element of the Array with the first
-    HNode* temp;
-    temp = this->heap[0];
-    this->heap[0] = this->heap[this->heap.size() - 1];
-    // this->heap[this->heap.size - 1] = temp;
-    this->heap.pop_back(); //delete last element from heap  
-
+    temp = heap_in.front();
+    heap_in.front() = heap_in.back();
+    //delete last element from heap
+    heap_in.pop_back();
     //restore heap Property
-    this->heapify(0);
+    this->heapify(0, heap_in);
     return temp;
 }
 
-// void Heap::decrease_key (int heap_pos_in, int id, int distval) {
-//     int j = heap_pos_in[id]; //j is the position of id in heap[];
-//     this->heap[j].dvalue = distval; //changed dvalue
-//     //now let's fix upwards in the heap
-//     while ((this->heap[j].dvalue < this->heap[(j-1)/2].dvalue) && (j > 0))
-//     {
-//         this->swap(heap_pos_in, j, (j-1)/2);
-//         j = (j - 1)/2;
-//     }
-// }
+void HeapInterface::decreaseKey (p_vec heap_in, p_vec portlist_in, s_Port dest_in)
+{
+    // dest_in->pheaploc;
+    // dest_in->splen;
+    int j = ; //j is the position of destination in heap[]
+    heap_in[dest_in->pheaploc]->splen = distval; //changed dvalue
+    //now let's fix upwards in the heap
+    while ((this->heap[j].dvalue < this->heap[(j-1)/2].dvalue) && (j > 0))
+    {
+        this->swap(heap_pos_in, j, (j-1)/2);
+        j = (j - 1)/2;
+    }
+}
+void decrease_key (heap, heap_pos, id, distval) {
+    j=heap_pos[id]; //j is the position of id in heap[];
+    heap[j].dvalue = distval; //changed dvalue
+    // now let's fix upwards in the heap
+    while ((heap[j].dvalue < heap[(j-1)/2].dvalue) && (j > 0))
+    {
+        swap(heap,heap_pos,j,(j-1)/2);
+        j=(j-1)/2;
+    }
+}
 
-// void Heap::swap(int heap_pos_in[], int child_in, int parent_in)
-// {
-//     int temp1id = this->heap[child_in]->vid;
-//     int temp1d = this->heap[child_in]->dvalue;
+int HeapInterface::bubbleUp(p_vec heap_in, int child_index)
+{//bubbles a child node up the heap until it reaches its correct place, then returns that location
+    childiout = child_index
+    int parenti = (childiout - 1) / this->kary;
+    s_Port temp;
+    //bubble up the inserted node
+    while(heap_in[parenti]->splen > heap_in[childiout]->splen)
+    {//while the parent's key is greater than the child's key
+        //swap parent and child
+        temp = heap_in[parenti];
+        heap_in[parenti] = heap_in[childiout];
+        heap_in[childiout] = temp;
+        //move parent and child indicies up the heap
+        childiout = parenti;
+        parenti = (childiout - 1) / this->kary;
+    }
+    return childiout;
+}
 
-//     this->heap[child_in]->vid = this->heap[parent_in]->vid;
-//     this->heap[child_in]->dvalue = this->heap[parent_in]->dvalue;
-//     this->heap[parent_in]->vid = temp1id;
-//     this->heap[parent_in]->dvalue = temp1d;
+vvoid swap(HeapObject heap[], int heap_pos[], int child, int parent )
+{
+    //store child node's info
+    temp1id = heap[child].vid;
+    temp1d = heap[child].dvalue;
 
-//     heap_pos_in[this->heap[child_in]->vid] = child_in;
-//     heap_pos_in[this->heap[parent_in]->vid = parent_in;
-// } // note the role of dereferencing array heap_pos_in
+    //set child info to parent's info
+    heap[child].vid = heap[parent].vid;
+    heap[child].dvalue = heap[parent].dvalue;
+
+    //set parent info to child's old info
+    heap[parent].vid = temp1id;
+    heap[parent].dvalue = temp1d;
+
+    //some bullshit
+    heap_pos[heap[child].vid] = child;
+    heap_pos[heap[parent].vid] = parent;
+} // note the role of dereferencing array heap_pos

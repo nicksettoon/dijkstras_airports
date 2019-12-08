@@ -7,13 +7,14 @@
 
 #include "heap.h"
 
-struct Flight;
+struct Flight;//forward declaration of Flight so Port struct can see it exists
 struct Port {//struct for airport info (vertexes)
 public:
-    std::string code;
+    int pheaploc; //port id (its index in the flightmap's portlist)
+    std::string code; //the airport code
     std::vector<std::shared_ptr<Port>> adjlist; //list of destination airports that are one flight from the current port
     std::vector<std::shared_ptr<Flight>> depflights; //list of flights departing from this airport
-    int dval;
+    float splen;
     // int parentid; what this for?
     //CONSTRUCTOR//
     Port(std::string code, int d_in);
@@ -33,22 +34,23 @@ struct Flight{//struct for flight data (edges)
     void prt();
 };
 
-class FlightMap
+class FlightMap : public HeapInterface
 {//class for creating and holding all the travel data related to a graph of airports and flights
-    std::vector<std::shared_ptr<Port>> ports;
-    std::vector<std::shared_ptr<Flight>> flights;
-    // std::unique_ptr<Heap> heap;
 public:
+    int portcount;
+    int flightcount;
+    std::vector<std::shared_ptr<Flight>> flights; //vector of flight pointers
+    // std::vector<std::shared_ptr<Port>> portlist; //vector of port pointers
+    std::vector<std::shared_ptr<Port>> portheap; //vector of port pointers for use with heap functions
     //CONSTRUCTOR//
     FlightMap(int port_count, int flight_count);
     //FUNCTIONS//
     static float genTime(int MAX_HOURS);
     static std::string genCode(int code_length);
     //PRINT FUNCTION//
-            // for(std::shared_ptr<flight> f : p->depflights){
     friend std::ostream& operator <<(std::ostream& os, std::shared_ptr<FlightMap> const fltmp)
     {
-        for(std::shared_ptr<Port> p : fltmp->ports){
+        for(std::shared_ptr<Port> p : fltmp->portlist){
             p->prt();
         }
         return os << "\n";

@@ -4,30 +4,41 @@
 #include "headers/flightmap.h"
 
 using str = std::string;
-// auto& out = std::cout;
-// auto& end = std::endl;
+using s_Port = std::shared_ptr<Port>;
+using s_Flight = std::shared_ptr<Flight>;
 
 int main()
 {
+    //declare map sizes
     int portcount = 10;
     int flightcount = 30;
+    //instantiate flight map
     std::shared_ptr<FlightMap> map = std::make_shared<FlightMap>(portcount, flightcount);
-
-    std::cout << map;
+    // std::cout << map; //print map
+    // startport = map->portlist.at(0); //starting port is the first port in the list
     // actual djikstras
-    // while(heap->heap.size() > 0){
-    //     HNode* extnode = heap->extractMin();
-    //     int x = extnode->vid;
-    //     for (int i = 0; i < n; i++){
-    //         int w = verts[x]->adjlist[i];
-    //     }
-    // }
-    // for (int i = 0 ; i < size ; i++){
-    //     HNode* node = heap->extractMin();
-    //     std::cout << node->vid << ":" << node->dvalue << "\t";
-    // }
+    while(map->portheap.size() > 0)
+    {//while there are ports left in the heap
+        s_Port* cport = map->extractMin(map->portheap);//grab the port with the smallest splen
+        int x = cport->pheaploc;
+        for (int i = 0; i < cport->depflights.size(); i++)
+        {//for each flight leaving the current port
+            s_Flight e = cport->depflights.at(i); //get flight object
+            s_Port w = e->dest //get dest port
+            //calc edge weight (flight time cost)
+            float t = (e->arrtime - e->deptime) + 1; //(arrival - departure) + 1 hour layover
+            float newsp = t + cport->splen; //get possible new shortest path to next port
+            if((newsp < w->splen)
+            {//if this flight is a shorter path from startport to w than what w already has stored
+                w->splen = t + cport->splen;
+                // w->pheaploc = x; why is this necessary?
+                map->decreaseKey(map->portheap, w, )
 
+            }
+        }
+    }
 
+    print()
     return 1;
 }
 //n=Readsize(inputfile);
@@ -58,11 +69,11 @@ int main()
 // ........int x = h.vid;
 // ........for (i=0;i<n;i++)
 // ........{
-// ................int w=V[x].adj_list[i];
-// ................if (V[x].weight[i] + V[x].dvalue < V[w].dvalue) {
-// ........................V[w].dvalue=V[x].weight + V[x].dvalue;
-// ........................V[w].pid = x;
-// ........................decrease_key(heap, heap_pos, w, V[w].dvalue);
+// ................int e=V[x].adj_list[i];
+// ................if (V[x].weight[i] + V[x].dvalue < V[e].dvalue) {
+// ........................V[e].dvalue=V[x].weight + V[x].dvalue;
+// ........................V[e].pheaploc = x;
+// ........................decrease_key(heap, heap_pos, e, V[e].dvalue);
 // ................}
 // ........} //for loop for x's adjacency list ends
 // }
