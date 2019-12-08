@@ -100,7 +100,7 @@ int main()
 {
     //declare map sizes
     int portcount = 15;
-    int flightcount = 30;
+    int flightcount = 23;
     //instantiate flight map
     std::shared_ptr<FlightMap> map = std::make_shared<FlightMap>(portcount, flightcount);
     map->genPorts();
@@ -109,14 +109,20 @@ int main()
     map->endport = map->portheap.at(13); //get starting port
     map->starttime = 4.20; //yoloswag420blazeit
     // std::shared_ptr<FlightMap> map = std::make_shared<FlightMap>();
-    std::cout << map; //print the initial map
+    // std::cout << map; //print the initial map
     // startPrompt(map);
 
     s_Port cport = map->startport; //set current port to start port
+    map->updateKey(map->startport, 0); //give first airport a shortest path of 0 since you're already there
     while(map->portheap.size() > 0)
     {//while there are ports left in the heap
         // std::cout << "\nAssessing airport: " << cport->code
                 //   << "\nIt has " << cport->depflights.size() << " departing flights." << std:: endl;
+        if(cport->depflights.size() == 0)
+        {
+            cport = map->extractMin();//grab the port with the smallest splen
+            continue;
+        }
         s_Flight spflight = checkFlights(map, cport);
         cport = map->extractMin();//grab the port with the smallest splen
         if(spflight->dest == cport) 

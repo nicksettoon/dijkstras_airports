@@ -22,6 +22,7 @@ struct Flight{//struct for flight data (edges)
     std::shared_ptr<Port> dest;
     float deptime; //departure time
     float arrtime; //arrival time
+    float length;  //weight of the edge
 
     //CONSTRUCTOR//
     Flight(std::shared_ptr<Port> orig_in, std::shared_ptr<Port> dest_in, unsigned int time_in, float length_in);

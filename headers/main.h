@@ -9,6 +9,7 @@
 #include <string>
 #include <memory>
 #include <cmath>
+#include <exception>
 //INTERNAL HEADER FILES//
 // #include "port.h"
 // #include "flight.h"

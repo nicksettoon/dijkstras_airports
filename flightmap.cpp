@@ -14,7 +14,7 @@ void FlightMap::genPorts()
     s_Port newport;
     for (int i = 0 ; i < this->portcount ; i++){
         str portcode = FlightMap::genCode(3); //generate airport code
-        newport = std::make_shared<Port>(portcode, std::numeric_limits<float>::max()); //create airport node with maximum splen
+        newport = std::make_shared<Port>(portcode, 100); //create airport node with maximum splen
         // newport->pheaploc = this->portlist.size(); //tell the port where it's located in the list
         this->insertPort(newport); //push the port onto the heap
     }
@@ -22,11 +22,13 @@ void FlightMap::genPorts()
 
 void FlightMap::genFlights()
 {//generate flights
-
     s_Flight newflight;
+    // int exitflights = (rand() % 3+1);
+    // int entryflights = (rand() % 3+1);
+
     for (int i = 0 ; i < this->flightcount; i++){
         float deptime = FlightMap::genTime(24); //gen random flight deptime less than 24hrs
-        float length = FlightMap::genTime(12) + 1; //generate random flight length less than 12hrs this is the weight of the edge
+        float length = FlightMap::genTime(6) + 1; //generate random flight length less than 12hrs this is the weight of the edge
         //randomize ports
         s_Port port1;
         s_Port port2;
@@ -79,6 +81,7 @@ int FlightMap::insertPort(s_Port port_in)
 
 int FlightMap::bubbleUp(int node_in)
 {//bubbles a child node up the heap until it reaches its correct place, then returns that location
+    // std::cout << "hit bubbleUp" << std::endl;
     int nodeout = node_in;
     int node_inparent= (nodeout - 1) / 2;
     s_Port oldport;
@@ -100,6 +103,7 @@ int FlightMap::bubbleUp(int node_in)
 
 int FlightMap::bubbleDown(int node_in)
 {
+    // std::cout << "hit bubbleDown" << std::endl;
     //assume given node is the smallest of the three being considered
     int smallest = node_in;
     //get left and right child indicies of current node
@@ -138,11 +142,14 @@ s_Port FlightMap::extractMin()
     this->portheap.pop_back();
     //restore heap Property
     this->bubbleDown(0);
+    std::cout << "extracting: " << std::endl;
+    oldport->prt();
     return oldport;
 }
 
 int FlightMap::updateKey(s_Port port_in, float new_splen)
 {//changes the key of a node in the heap and begins the process of moving it to the proper location
+    std::cout << "hit update key" << std::endl;
     port_in->splen = new_splen;//change port's key in heap
     //now let's fix upwards in the heap
     if(port_in->pheaploc == 0)
