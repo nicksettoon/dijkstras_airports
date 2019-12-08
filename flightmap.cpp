@@ -7,8 +7,8 @@ using s_Flight = std::shared_ptr<Flight>;
 FlightMap::FlightMap(int port_count, int flight_count)
     : portcount(port_count), flightcount(flight_count)
     {/*CONSTRUCTOR*/
-        s_Port newport = std::make_shared<Port>("ABC", std::numeric_limits<float>::max()); //create airport node with maximum splen
-        this->portheap.push_back(newport);
+        // s_Port newport = std::make_shared<Port>("ABC", 0); //create airport node with maximum splen
+        // this->portheap.push_back(newport);
     }
 
 void FlightMap::genPorts()
@@ -147,6 +147,11 @@ int FlightMap::updateKey(s_Port port_in, float new_splen)
 {//changes the key of a node in the heap and begins the process of moving it to the proper location
     port_in->splen = new_splen;//change port's key in heap
     //now let's fix upwards in the heap
+    if(port_in->pheaploc == 0)
+    {
+        port_in->splen = new_splen;
+        return 0;
+    }
     if(port_in->splen < this->portheap.at((port_in->pheaploc - 1)/2)->splen)
     {//if port's key is less than it's parent's key
         return this->bubbleUp(port_in->pheaploc); //bubble the port node up the heap

@@ -32,8 +32,8 @@ class FlightMap
 public:
     int portcount;
     int flightcount;
-    std::vector<std::shared_ptr<Flight>> flights; //vector of flight pointers
-    std::vector<std::shared_ptr<Port>> portheap; //vector of port pointers for use with heap functions
+    std::vector<std::shared_ptr<Flight>> flights{}; //vector of flight pointers
+    std::vector<std::shared_ptr<Port>> portheap{}; //vector of port pointers for use with heap functions
     //CONSTRUCTOR//
     FlightMap(int port_count, int flight_count);
     //FUNCTIONS//
