@@ -7,11 +7,7 @@ using s_Flight = std::shared_ptr<Flight>;
 FlightMap::FlightMap(){/*CONSTRUCTOR*/}
 
 FlightMap::FlightMap(int port_count, int flight_count)
-    : portcount(port_count), flightcount(flight_count){/*CONSTRUCTOR*/}
-    lkasjdlkfjasdfalksdjf
-    asdlfjalsdf
-    asldfjalsd
-    
+    : portcount(port_count), flightcount(flight_count){/*CONSTRUCTOR*/}    
 
 void FlightMap::genPorts()
 {//generate ports
