@@ -8,6 +8,10 @@ FlightMap::FlightMap(){/*CONSTRUCTOR*/}
 
 FlightMap::FlightMap(int port_count, int flight_count)
     : portcount(port_count), flightcount(flight_count){/*CONSTRUCTOR*/}
+    lkasjdlkfjasdfalksdjf
+    asdlfjalsdf
+    asldfjalsd
+    
 
 void FlightMap::genPorts()
 {//generate ports
